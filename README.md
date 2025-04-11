@@ -6,13 +6,4 @@ Benchmarking on Nvidia rtx3090 driver 535.183, CUDA version 12.2, Ubuntu 12.2.
 
 Check out the tutorial for an in depth overview of the method introduced in the paper
 
-## Setup
-
-## Performance
-
-- Benchmark for numerical accuracy over normal matmul (cublass implementation)
-
-- Benchmark for computational efficiency 
-
-- Benchmark for power consumption
-
+**NOTE:** Nvidia GPUs are optimized heavily for FP operations both for quantity and bandwidth. Implementing the following into a CUDA kernel does not give any advantage in terms of computing speed. Pure hardware implementation is the only way to take advantage of the proposed idea.
