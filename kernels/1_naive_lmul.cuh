@@ -1,16 +1,21 @@
 #include <iostream>
 #include <math.h>
 
-__device__
-float Lmul(int x, int y){
-    if (x == 0 || y == 0) {
-        return 0;
-    }
-    return (((x >> 31)) ^ ((y >> 31))) << 31 | ((x & 0x7FFFFFFF) + (y & 0x7FFFFFFF) - 0x3F780000) & 0x7FFFFFFF;
+__device__ 
+float Lmul(float x, float y){
+    union { int i; float f; } X;
+    union { int i; float f; } Y;
+    union { int i; float f; } Z;
+
+    X.f = x;
+    Y.f = y;
+    Z.i = (((X.i >> 31)) ^ ((Y.i >> 31))) << 31 |  // Sign XOR
+    ((X.i & 0x7FFFFFFF) + (Y.i & 0x7FFFFFFF) - 0x3F780000) & 0x7FFFFFFF;
+    return Z.f;
 }
 
 __global__
-void sgemm_naive_lmul(int M, int N, int K, int alpha, const int *A, const int *B, int beta, int *C){
+void sgemm_naive_lmul(int M, int N, int K, float alpha, const float *A, const float *B, float beta, float *C){
     const int x= blockIdx.x * blockDim.x + threadIdx.x;
     const int y= blockIdx.y * blockDim.y + threadIdx.y;
 

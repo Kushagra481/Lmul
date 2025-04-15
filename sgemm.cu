@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
   float *A = nullptr, *B = nullptr, *C = nullptr, *C_ref = nullptr; // host matrices
 
   float *dA = nullptr, *dB = nullptr, *dC = nullptr, *dC_ref = nullptr; // device matrices
-  int *dA_i = nullptr, *dB_i = nullptr, *dC_i = nullptr; // int device matrices
+  // int *dA_i = nullptr, *dB_i = nullptr, *dC_i = nullptr; // int device matrices
 
   A = (float *)malloc(sizeof(float) * max_size * max_size);
   B = (float *)malloc(sizeof(float) * max_size * max_size);
@@ -83,9 +83,9 @@ int main(int argc, char **argv) {
   cudaCheck(cudaMalloc((void **)&dC, sizeof(float) * max_size * max_size));
   cudaCheck(cudaMalloc((void **)&dC_ref, sizeof(float) * max_size * max_size));
   
-  cudaCheck(cudaMalloc((void **)&dA_i, sizeof(int) * max_size * max_size));
-  cudaCheck(cudaMalloc((void **)&dB_i, sizeof(int) * max_size * max_size));
-  cudaCheck(cudaMalloc((void **)&dC_i, sizeof(int) * max_size * max_size));
+  // cudaCheck(cudaMalloc((void **)&dA_i, sizeof(int) * max_size * max_size));
+  // cudaCheck(cudaMalloc((void **)&dB_i, sizeof(int) * max_size * max_size));
+  // cudaCheck(cudaMalloc((void **)&dC_i, sizeof(int) * max_size * max_size));
 
   cudaCheck(cudaMemcpy(dA, A, sizeof(float) * max_size * max_size,
                        cudaMemcpyHostToDevice));
@@ -98,11 +98,11 @@ int main(int argc, char **argv) {
 
   // Cast device float matrix to int matrix
   // We don't reset dC between runs to save time
-  int_casting_on_device(dA, dA_i, max_size);
-  int_casting_on_device(dB, dB_i, max_size);
-  int_casting_on_device(dC, dC_i, max_size);
-  cudaCheck(cudaDeviceSynchronize());
-  cudaCheck(cudaGetLastError());
+  // int_casting_on_device(dA, dA_i, max_size);
+  // int_casting_on_device(dB, dB_i, max_size);
+  // int_casting_on_device(dC, dC_i, max_size);
+  // cudaCheck(cudaDeviceSynchronize());
+  // cudaCheck(cudaGetLastError());
 
   int repeat_times = 3;
   for (int size : SIZE) {
@@ -114,11 +114,11 @@ int main(int argc, char **argv) {
     // kernel function timing to avoid cold start errors
     if (kernel_num != 0) {
       run_kernel_matmul(0, m, n, k, alpha, dA, dB, beta, dC_ref, handle); // Executes the kernel, modifies the result matrix
-      run_kernel_lmul(kernel_num, m, n, k, alpha_i, dA_i, dB_i, beta_i, dC_i, handle); // Executes the kernel, modifies the result matrix
+      run_kernel_lmul(kernel_num, m, n, k, alpha_i, dA, dB, beta_i, dC, handle); // Executes the kernel, modifies the result matrix
       cudaCheck(cudaDeviceSynchronize());
       cudaCheck(cudaGetLastError());
       
-      float_casting_on_device(dC_i, dC, max_size);
+      // float_casting_on_device(dC_i, dC, max_size);
       cudaCheck(cudaDeviceSynchronize());
       cudaCheck(cudaGetLastError()); // Check for async errors during kernel run
       
@@ -131,7 +131,7 @@ int main(int argc, char **argv) {
     cudaEventRecord(beg);
     for (int j = 0; j < repeat_times; j++) {
       // We don't reset dC between runs to save time
-      run_kernel_matmul(kernel_num, m, n, k, alpha, dA, dB, beta, dC, handle);
+      run_kernel_lmul(kernel_num, m, n, k, alpha, dA, dB, beta, dC, handle);
     }
     cudaEventRecord(end);
     cudaEventSynchronize(beg);
@@ -152,7 +152,7 @@ int main(int argc, char **argv) {
     cudaEventRecord(beg);
     for (int j = 0; j < repeat_times; j++) {
       // We don't reset dC between runs to save time
-      run_kernel_lmul(kernel_num, m, n, k, alpha_i, dA_i, dB_i, beta_i, dC_i, handle);
+      run_kernel_matmul(kernel_num, m, n, k, alpha_i, dA, dB, beta_i, dC, handle);
     }
     cudaEventRecord(end);
     cudaEventSynchronize(beg);
@@ -170,9 +170,6 @@ int main(int argc, char **argv) {
     // for benchmarking)
     cudaCheck(cudaMemcpy(dC, dC_ref, sizeof(float) * m * n,
                          cudaMemcpyDeviceToDevice));
-    cudaCheck(cudaMemcpy(dC_i, dC_ref, sizeof(int) * m * n,
-                         cudaMemcpyDeviceToDevice));
-    // int_casting_on_device(dC_ref, dC_i, max_size);
   }
 
   // Free up CPU and GPU space
@@ -183,9 +180,9 @@ int main(int argc, char **argv) {
   cudaFree(dA);
   cudaFree(dB);
   cudaFree(dC);
-  cudaFree(dA_i);
-  cudaFree(dB_i);
-  cudaFree(dC_i);
+  // cudaFree(dA_i);
+  // cudaFree(dB_i);
+  // cudaFree(dC_i);
   cudaFree(dC_ref);
   cublasDestroy(handle);
 

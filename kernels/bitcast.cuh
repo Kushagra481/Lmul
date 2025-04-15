@@ -15,7 +15,6 @@ __device__ int float_to_int(float x) {
 __global__
 void int_bitcast(const float *in, int *out, int size){
     const int x= blockIdx.x * blockDim.x + threadIdx.x;
-    union { int i; float f; } converter;
     if(x < size) {
         out[x] = float_to_int(in[x]);
     }

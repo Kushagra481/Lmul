@@ -59,16 +59,11 @@ void randomize_matrix(float *mat, int N) {
   struct timeval time {};
   gettimeofday(&time, nullptr);
   srand(time.tv_usec);
-  float maxVal = 0.0;
-  float minVal = 0.0;
   for (int i = 0; i < N; i++) {
     float tmp = (float)(rand() % 5) + 0.01 * (rand() % 5);
     tmp = (rand() % 2 == 0) ? tmp : tmp * (-1.);
     mat[i] = tmp;
-    if (tmp > maxVal) {maxVal = tmp;}
-    if (tmp < minVal) {minVal = tmp;}
   }
-  std::cout << "Max value: " << maxVal << " Min value: " << minVal << std::endl;
 }
 
 void range_init_matrix(float *mat, int N) {
@@ -175,15 +170,15 @@ sgemm1DBlocktiling_matmul<BM, BN, BK, TM>
 <<<gridDim, blockDim>>>(M, N, K, alpha, A, B, beta, C);
 }
 
-void run_sgemm_naive_lmul(int M, int N, int K, int alpha, int *A, int *B,
-      int beta, int *C) {
+void run_sgemm_naive_lmul(int M, int N, int K, int alpha, float *A, float *B,
+      float beta, float *C) {
 dim3 gridDim(CEIL_DIV(M, 32), CEIL_DIV(N, 32));
 dim3 blockDim(32, 32);
 sgemm_naive_lmul<<<gridDim, blockDim>>>(M, N, K, alpha, A, B, beta, C);
 }
 
-void runSgemm1DBlocktiling_lmul(int M, int N, int K, int alpha, int *A, int *B,
-  int beta, int *C) {
+void runSgemm1DBlocktiling_lmul(int M, int N, int K, int alpha, float *A, float *B,
+  float beta, float *C) {
   const uint BM = 64;
   const uint BN = 64;
   const uint BK = 8;
@@ -223,8 +218,8 @@ switch (kernel_num) {
 }
 }
 
-void run_kernel_lmul(int kernel_num, int M, int N, int K, int alpha, int *A,
-  int *B, int beta, int *C, cublasHandle_t handle){
+void run_kernel_lmul(int kernel_num, int M, int N, int K, float alpha, float *A,
+  float *B, float beta, float *C, cublasHandle_t handle){
 switch (kernel_num) {
   case 1:
   run_sgemm_naive_lmul(M, N, K, alpha, A, B, beta, C);

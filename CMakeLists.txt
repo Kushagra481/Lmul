@@ -10,6 +10,7 @@ check_language(CUDA)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CUDA_COMPUTE_CAPABILITY 86)
+set(CMAKE_CUDA_FLAGS_DEBUG "-g")
 
 # in debug mode, add debug symbols to device code
 # this disables most optimizations and kills performance
@@ -25,5 +26,6 @@ list(FILTER SRC EXCLUDE REGEX ".*test\\.cu$")
 
 # generate executable
 add_executable(sgemm sgemm.cu ${SRC})
+
 set_target_properties(sgemm PROPERTIES CUDA_ARCHITECTURES ${CUDA_COMPUTE_CAPABILITY})
 target_link_libraries(sgemm ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES})

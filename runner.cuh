@@ -25,5 +25,5 @@ void float_casting_on_device(const int *in, float *out, int size);
 
 void run_kernel_matmul(int kernel_num, int m, int n, int k, float alpha, float *A,
                 float *B, float beta, float *C, cublasHandle_t handle);
-void run_kernel_lmul(int kernel_num, int m, int n, int k, int alpha, int *A,
-                    int *B, int beta, int *C, cublasHandle_t handle);
+void run_kernel_lmul(int kernel_num, int m, int n, int k, float alpha, float *A,
+                    float *B, float beta, float *C, cublasHandle_t handle);
